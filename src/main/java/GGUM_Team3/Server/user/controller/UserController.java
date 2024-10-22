@@ -1,5 +1,6 @@
 package GGUM_Team3.Server.user.controller;
 
+
 import GGUM_Team3.Server.sercurity.GoogleTokenVerifier;
 import GGUM_Team3.Server.sercurity.TokenProvider;
 import GGUM_Team3.Server.user.dto.ResponseDTO;
@@ -102,7 +103,7 @@ public class UserController {
             final String jwtToken = tokenProvider.create(user);
             final UserDTO responseUserDTO = UserDTO.builder()
                     .email(user.getEmail())
-                    .id(user.getId())  // 여기서는 UUID를 사용
+                    .id(user.getId())
                     .token(jwtToken)
                     .build();
 

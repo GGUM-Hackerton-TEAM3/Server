@@ -12,10 +12,10 @@ import java.util.Collections;
 public class GoogleTokenVerifier {
 
     private final GoogleIdTokenVerifier verifier;
-
+    //"139796939141-l9nb08r81e2cmgj51ml18fg5btf4tsn9.apps.googleusercontent.com"
     public GoogleTokenVerifier() {
         verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-                .setAudience(Collections.singletonList("139796939141-l9nb08r81e2cmgj51ml18fg5btf4tsn9.apps.googleusercontent.com"))
+                .setAudience(Collections.singletonList("407408718192.apps.googleusercontent.com"))
                 .build();
     }
 
