@@ -81,11 +81,11 @@ public class UserController {
     @PostMapping("/google")
     public ResponseEntity<?> googleAuthenticate(@RequestBody Map<String, String> body) {
         String token = body.get("token");
-        log.info("토큰 {}",token);
+
         String userId = googleTokenVerifier.verify(token);
-        log.info("그래도 와지긴 {}",userId);
+
         if (userId != null) {
-            log.info("비어있는건 아닌데 {}",userId);
+
             UserEntity user = userService.getById(userId);
             if (user == null) {
                 // 새로운 Google 사용자일 경우 UserEntity 생성 및 저장
