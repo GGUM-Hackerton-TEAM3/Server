@@ -82,25 +82,27 @@ public class UserController {
     public ResponseEntity<?> googleAuthenticate(@RequestBody Map<String, String> body) {
         String token = body.get("token");
 
-        String userId = googleTokenVerifier.verify(token);
+        String userId = googleTokenVerifier.verify(token); // 구글 토큰 검증
+        String email = googleTokenVerifier.getEmail(token); // 구글 토큰에서 이메일 추출
 
-        if (userId != null) {
+        if (userId != null && email != null) {
+            // 이메일로 기존 사용자 확인
+            UserEntity user = userService.getByEmail(email);
 
-            UserEntity user = userService.getById(userId);
             if (user == null) {
                 // 새로운 Google 사용자일 경우 UserEntity 생성 및 저장
                 user = UserEntity.builder()
-                        .id(userId)
-                        .email(googleTokenVerifier.getEmail(token))
-                        .username(googleTokenVerifier.getName(token))
+                        .email(email)
+                        .username(googleTokenVerifier.getName(token)) // 구글에서 이름 가져오기
                         .build();
                 userService.create(user);
             }
 
+            // JWT 생성 및 반환
             final String jwtToken = tokenProvider.create(user);
             final UserDTO responseUserDTO = UserDTO.builder()
                     .email(user.getEmail())
-                    .id(user.getId())
+                    .id(user.getId())  // 여기서는 UUID를 사용
                     .token(jwtToken)
                     .build();
 
@@ -112,4 +114,5 @@ public class UserController {
             return ResponseEntity.badRequest().body(responseDTO);
         }
     }
+
 }

@@ -41,4 +41,8 @@ public class UserService {
         Optional<UserEntity> user = userRepository.findById(userId);
         return user.orElse(null);
     }
+
+    public UserEntity getByEmail(String email) {
+        return userRepository.findByEmail(email); // 이메일로 사용자 조회
+    }
 }
