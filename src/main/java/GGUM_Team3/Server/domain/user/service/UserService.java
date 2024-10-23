@@ -1,7 +1,7 @@
-package GGUM_Team3.Server.user.service;
+package GGUM_Team3.Server.domain.user.service;
 
-import GGUM_Team3.Server.user.Repository.UserRepository;
-import GGUM_Team3.Server.user.entity.UserEntity;
+import GGUM_Team3.Server.domain.user.entity.UserEntity;
+import GGUM_Team3.Server.domain.user.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

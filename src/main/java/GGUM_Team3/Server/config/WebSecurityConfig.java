@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -26,7 +28,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
-
 public class WebSecurityConfig {
 
     private final ObjectMapper objectMapper;
@@ -40,6 +41,10 @@ public class WebSecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
@@ -50,9 +55,16 @@ public class WebSecurityConfig {
             try {
                 auth
                         .requestMatchers(
-                                new AntPathRequestMatcher("/"),
-                                new AntPathRequestMatcher("/auth/**"),
-                                new AntPathRequestMatcher("/h2-console/**"))
+                                "/",
+                                "/auth/**",
+                                "/h2-console/**",
+
+                                //swagger
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**"
+                        )
                         .permitAll();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -72,7 +84,6 @@ public class WebSecurityConfig {
             });
         });
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
 

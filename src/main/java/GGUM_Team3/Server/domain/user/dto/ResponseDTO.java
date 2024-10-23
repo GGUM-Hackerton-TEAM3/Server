@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.user.dto;
+package GGUM_Team3.Server.domain.user.dto;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
 public class ResponseDTO<T> {
     private String error;
     private List<T> data;

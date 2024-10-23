@@ -1,9 +1,9 @@
 package GGUM_Team3.Server.user.controller;
 
 import GGUM_Team3.Server.sercurity.TokenProvider;
-import GGUM_Team3.Server.user.dto.UserDTO;
-import GGUM_Team3.Server.user.entity.UserEntity;
-import GGUM_Team3.Server.user.service.UserService;
+import GGUM_Team3.Server.domain.user.dto.UserDTO;
+import GGUM_Team3.Server.domain.user.entity.UserEntity;
+import GGUM_Team3.Server.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

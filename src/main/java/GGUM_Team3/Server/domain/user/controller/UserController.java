@@ -1,19 +1,18 @@
-package GGUM_Team3.Server.user.controller;
+package GGUM_Team3.Server.domain.user.controller;
 
 
+import GGUM_Team3.Server.domain.image.service.ImageService;
+import GGUM_Team3.Server.domain.user.dto.ResponseDTO;
+import GGUM_Team3.Server.domain.user.dto.UserDTO;
+import GGUM_Team3.Server.domain.user.entity.UserEntity;
+import GGUM_Team3.Server.domain.user.service.UserService;
 import GGUM_Team3.Server.sercurity.GoogleTokenVerifier;
 import GGUM_Team3.Server.sercurity.TokenProvider;
-import GGUM_Team3.Server.user.dto.ResponseDTO;
-import GGUM_Team3.Server.user.dto.UserDTO;
-import GGUM_Team3.Server.user.entity.UserEntity;
-import GGUM_Team3.Server.user.service.UserService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -23,35 +22,27 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/auth")
 public class UserController {
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
-    private GoogleTokenVerifier googleTokenVerifier;
-
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
+    private final UserService userService;
+    private final TokenProvider tokenProvider;
+    private final GoogleTokenVerifier googleTokenVerifier;
+    private final PasswordEncoder passwordEncoder;
+    private final ImageService imageService;
     @PostMapping("/signup")
-    public ResponseEntity<?>registerUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<?>registerUser(@ModelAttribute UserDTO userDTO){ //todo : 임시입니다.
         try {
             UserEntity user = UserEntity.builder()
                     .email(userDTO.getEmail())
                     .username(userDTO.getUsername())
+                    .profileImageUrl(imageService.saveImage(userDTO.getProfileImage()))
                     .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
 
-            UserEntity registeredUser = userService.create(user);
-            UserDTO responseUserDTO = userDTO.builder()
-                    .email(registeredUser.getEmail())
-                    .id(registeredUser.getId())
-                    .username(registeredUser.getUsername())
-                    .build();
-            return ResponseEntity.ok().body(responseUserDTO);
+            userService.create(user);
+
+            return ResponseEntity.ok().build();
         } catch(Exception e) {
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(responseDTO);
