@@ -1,6 +1,6 @@
-package GGUM_Team3.Server.user.Repository;
+package GGUM_Team3.Server.domain.user.Repository;
 
-import GGUM_Team3.Server.user.entity.UserEntity;
+import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

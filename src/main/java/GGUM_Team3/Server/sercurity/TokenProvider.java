@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-import GGUM_Team3.Server.user.entity.UserEntity;
+import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
 

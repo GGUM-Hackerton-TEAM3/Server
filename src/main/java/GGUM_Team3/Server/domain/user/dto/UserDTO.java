@@ -1,9 +1,10 @@
-package GGUM_Team3.Server.user.dto;
+package GGUM_Team3.Server.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -14,6 +15,6 @@ public class UserDTO {
     private String email;
     private String username;
     private String password;
+    private MultipartFile profileImage;
     private String id;
-
 }
