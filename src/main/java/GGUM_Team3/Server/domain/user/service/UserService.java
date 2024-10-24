@@ -1,10 +1,10 @@
 package GGUM_Team3.Server.domain.user.service;
 
 import GGUM_Team3.Server.domain.image.service.ImageService;
-import GGUM_Team3.Server.domain.user.Repository.UserRepository;
-import GGUM_Team3.Server.domain.user.dto.LoginRequest;
-import GGUM_Team3.Server.domain.user.dto.LoginResponse;
-import GGUM_Team3.Server.domain.user.dto.SignupRequest;
+import GGUM_Team3.Server.domain.user.repository.UserRepository;
+import GGUM_Team3.Server.domain.auth.dto.request.LoginRequest;
+import GGUM_Team3.Server.domain.auth.dto.response.LoginResponse;
+import GGUM_Team3.Server.domain.auth.dto.request.SignupRequest;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import GGUM_Team3.Server.global.sercurity.GoogleTokenVerifier;
 import GGUM_Team3.Server.global.sercurity.TokenProvider;
