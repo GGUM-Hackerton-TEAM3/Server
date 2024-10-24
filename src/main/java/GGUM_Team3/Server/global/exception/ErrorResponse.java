@@ -29,11 +29,19 @@ public class ErrorResponse {
         this.message = code.getMessage();
         this.errors = errors;
     }
+    private ErrorResponse(final String code, final String message) {
+        this.code = code;
+        this.message = message;
+        this.errors = Collections.emptyList();
+    }
     public static ErrorResponse of(final ErrorCode code) {
         return new ErrorResponse(code);
     }
     public static ErrorResponse of(final ErrorCode code, final BindingResult bindingResult) {
         return new ErrorResponse(code, FieldResponse.of(bindingResult));
+    }
+    public static ErrorResponse of(final String code, final String message) {
+        return new ErrorResponse(code, message);
     }
 
     @Getter
