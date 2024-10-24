@@ -1,6 +1,6 @@
 package GGUM_Team3.Server.domain.user.entity;
 
-import GGUM_Team3.Server.domain.user.dto.SignupRequest;
+import GGUM_Team3.Server.domain.auth.dto.request.SignupRequest;
 import GGUM_Team3.Server.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

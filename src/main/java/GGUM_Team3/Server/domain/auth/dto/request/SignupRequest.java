@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.domain.user.dto;
+package GGUM_Team3.Server.domain.auth.dto.request;
 
 import GGUM_Team3.Server.domain.user.entity.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;

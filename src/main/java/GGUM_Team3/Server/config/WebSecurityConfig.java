@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                                 "/",
                                 "/auth/**",
                                 "/h2-console/**",
+                                "/temp/**",
 
                                 //swagger
                                 "/v3/api-docs/**",

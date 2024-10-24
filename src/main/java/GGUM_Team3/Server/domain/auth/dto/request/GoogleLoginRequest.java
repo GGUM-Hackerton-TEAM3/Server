@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.domain.user.dto;
+package GGUM_Team3.Server.domain.auth.dto.request;
 
 import lombok.Data;
 

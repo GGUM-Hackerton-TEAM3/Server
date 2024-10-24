@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.domain.user.dto;
+package GGUM_Team3.Server.domain.auth.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

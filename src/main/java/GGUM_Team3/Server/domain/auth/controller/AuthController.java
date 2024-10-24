@@ -1,15 +1,20 @@
-package GGUM_Team3.Server.domain.user.controller;
+package GGUM_Team3.Server.domain.auth.controller;
 
 
-import GGUM_Team3.Server.domain.user.dto.GoogleLoginRequest;
-import GGUM_Team3.Server.domain.user.dto.LoginRequest;
-import GGUM_Team3.Server.domain.user.dto.LoginResponse;
-import GGUM_Team3.Server.domain.user.dto.SignupRequest;
+import GGUM_Team3.Server.domain.auth.dto.request.MailSendRequest;
+import GGUM_Team3.Server.domain.auth.dto.request.MailVerificationRequest;
+import GGUM_Team3.Server.domain.auth.dto.request.GoogleLoginRequest;
+import GGUM_Team3.Server.domain.auth.dto.request.LoginRequest;
+import GGUM_Team3.Server.domain.auth.dto.response.LoginResponse;
+import GGUM_Team3.Server.domain.auth.dto.request.SignupRequest;
+import GGUM_Team3.Server.domain.auth.service.AuthService;
 import GGUM_Team3.Server.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "회원 인증 관련 API")
 public class AuthController {
     private final UserService userService;
+    private final AuthService authService;
     @Operation(summary = "일반 회원가입")
     @PostMapping(value = "/signup", consumes = "multipart/form-data")
     public ResponseEntity<Void>registerUser(@Validated @ModelAttribute SignupRequest signupRequest){
@@ -50,4 +56,17 @@ public class AuthController {
         return ResponseEntity.ok(userService.loginWithGoogle(googleLoginRequest.getToken()));
 
     }
+    @Operation(summary = "학교 이메일 인증 요청")
+    @PostMapping("/send-code")
+    public ResponseEntity<Void> sendCode(@RequestBody @Valid MailSendRequest mailSendRequest) {
+        authService.sendVerificationCode(mailSendRequest.getEmail());
+        return ResponseEntity.ok().build();
+    }
+    @Operation(summary = "인증 코드 확인")
+    @PostMapping("/verify-code")
+    public ResponseEntity<Void> verifyCode(@RequestBody @Valid MailVerificationRequest mailVerificationRequest) {
+        authService.verifyCode(mailVerificationRequest.getEmail(), mailVerificationRequest.getCode());
+        return ResponseEntity.ok().build();
+    }
 }
+
