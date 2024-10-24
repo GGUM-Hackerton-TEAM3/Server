@@ -1,6 +1,6 @@
 package GGUM_Team3.Server.user.controller;
 
-import GGUM_Team3.Server.domain.user.dto.SignupRequest;
+import GGUM_Team3.Server.domain.auth.dto.request.SignupRequest;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import GGUM_Team3.Server.domain.user.service.UserService;
 import GGUM_Team3.Server.global.sercurity.TokenProvider;
