@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.sercurity;
+package GGUM_Team3.Server.global.sercurity;
 
 import org.springframework.stereotype.Service;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;

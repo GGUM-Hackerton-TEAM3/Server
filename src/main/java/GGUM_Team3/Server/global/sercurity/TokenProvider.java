@@ -1,10 +1,11 @@
-package GGUM_Team3.Server.sercurity;
+package GGUM_Team3.Server.global.sercurity;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -16,7 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class TokenProvider {
-    private static final String SECRET_KEY = "NMA8JPctFuna59f5";
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
 
     public String create(UserEntity userEntity) {
         Date expireDate = Date.from(
@@ -25,7 +27,7 @@ public class TokenProvider {
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .setSubject(userEntity.getId())
-                .setIssuer("bungae")
+                .setIssuer("oneul")
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .compact();
@@ -38,7 +40,7 @@ public class TokenProvider {
         return Jwts.builder()
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .setSubject(userId)
-                .setIssuer("bungae")
+                .setIssuer("oneul")
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .compact();

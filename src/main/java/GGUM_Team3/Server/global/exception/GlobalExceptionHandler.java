@@ -9,6 +9,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Slf4j
@@ -38,6 +40,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ResponseStatusException.class)
+    protected ResponseEntity<ErrorResponse> handleResponseStatusException(final ResponseStatusException e) {
+        log.warn("ResponseStatusException", e);
+        final ErrorResponse response = ErrorResponse.of(
+                Integer.toString(e.getStatusCode().value()),
+                e.getReason() != null ? e.getReason() : e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    protected ResponseEntity<ErrorResponse> handleRuntimeException(final RuntimeException e) {
+        log.warn("RuntimeException", e);
+        final ErrorResponse response = ErrorResponse.of(
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                e.getMessage() != null && !e.getMessage().isEmpty()
+                ? e.getMessage()
+                : ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     // 서버 에러
     @ExceptionHandler(Exception.class)

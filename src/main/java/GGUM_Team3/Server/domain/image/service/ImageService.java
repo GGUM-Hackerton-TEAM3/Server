@@ -27,7 +27,8 @@ public class ImageService {
     private String region;
 
     @Transactional
-    public String saveImage(MultipartFile file) throws IOException {
+    public String saveImage(MultipartFile file) {
+        if(file == null) return null;
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
         try {
@@ -39,7 +40,7 @@ public class ImageService {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         } catch (Exception e) {
-            throw new IOException("파일 업로드 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
         }
 
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, region, fileName);
