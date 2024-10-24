@@ -27,3 +27,9 @@ cloud:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
+jwt:
+  secret-key: CwS0ejODKrwKcZFCkXAeScfgixh2dKKtZj4eN5FdJoDHAeXpd7ScsxDqCmTGJtOGhQ75T33L1thACccTgjXuvw==
+
+
+
