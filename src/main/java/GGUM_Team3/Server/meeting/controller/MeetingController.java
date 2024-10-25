@@ -1,6 +1,7 @@
 package GGUM_Team3.Server.meeting.controller;
 
 import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
+import GGUM_Team3.Server.meeting.service.LikeService;
 import GGUM_Team3.Server.meeting.service.MeetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,9 @@ import java.util.UUID;
 public class MeetingController {
     @Autowired
     private MeetingService meetingService;
+
+    @Autowired
+    private LikeService likeService;
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
@@ -47,5 +51,19 @@ public class MeetingController {
     @PostMapping("/{id}/leave")
     public ResponseEntity<MeetingDTO> leaveMeeting(@PathVariable String id, @RequestParam String userId) {
         return ResponseEntity.ok(meetingService.leaveMeeting(id, userId));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Integer> likeMeeting(@PathVariable String id, @RequestParam String userId) {
+        int likesCount = likeService.likeMeeting(id, userId);
+        return ResponseEntity.ok(likesCount);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/unlike")
+    public ResponseEntity<Integer> unlikeMeeting(@PathVariable String id, @RequestParam String userId) {
+        int likesCount = likeService.unlikeMeeting(id, userId);
+        return ResponseEntity.ok(likesCount);
     }
 }

@@ -9,6 +9,7 @@ import GGUM_Team3.Server.meeting.repository.MeetingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,8 @@ public class MeetingService {
                 .description(meetingDTO.getDescription())
                 .maxParticipants(meetingDTO.getMaxParticipants())
                 .startTime(meetingDTO.getStartTime())
+                .notice(meetingDTO.getNotice()) // 공지 태그 추가
+                .tags(meetingDTO.getTags()) // 태그 필드 추가
                 .build();
         Meeting savedMeeting = meetingRepository.save(meeting);
         return MeetingDTO.fromEntity(savedMeeting);
@@ -44,7 +47,7 @@ public class MeetingService {
     }
 
 
-    //title에서 keyword 있는지 확인
+    // title에서 keyword 있는지 확인
     public List<MeetingDTO> searchMeetings(String keyword) {
         return meetingRepository.findByTitleContaining(keyword).stream()
                 .map(MeetingDTO::fromEntity)
@@ -56,6 +59,16 @@ public class MeetingService {
                 .orElseThrow(() -> new RuntimeException("Meeting not found"));
         UserEntity user = userService.getById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 현재 시간이 모임 시작 시간 이후라면 가입 불가 처리
+        if (meeting.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Cannot join meeting after it has started.");
+        }
+
+        // 이미 모임에 가입된 경우 처리
+        if (meeting.getParticipants().contains(user)) {
+            throw new RuntimeException("User already joined the meeting.");
+        }
 
         if (meeting.getParticipants().size() < meeting.getMaxParticipants()) {
             meeting.getParticipants().add(user);
@@ -76,4 +89,3 @@ public class MeetingService {
         return MeetingDTO.fromEntity(updatedMeeting);
     }
 }
-

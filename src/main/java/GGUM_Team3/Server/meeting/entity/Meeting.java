@@ -1,4 +1,3 @@
-// 모임 관련 엔티티
 package GGUM_Team3.Server.meeting.entity;
 
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
@@ -8,7 +7,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Data
@@ -35,11 +35,27 @@ public class Meeting {
     private String chatRoomId; // 채팅방ID 필드
     private String categoryId; // 카테고리ID 필드
 
+    @ElementCollection
+    private List<String> tags;
+
     @ManyToMany
     @JoinTable(
             name = "meeting_members",
             joinColumns = @JoinColumn(name = "meeting_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<UserEntity> participants;
+    private Set<UserEntity> participants = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "meeting_likes",
+            joinColumns = @JoinColumn(name = "meeting_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<UserEntity> likes = new HashSet<>();
+
+    // 좋아요 개수 반환 메서드
+    public int getLikesCount() {
+        return likes.size();
+    }
 }
