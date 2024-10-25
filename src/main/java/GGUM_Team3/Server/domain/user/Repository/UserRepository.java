@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.domain.user.Repository;
+package GGUM_Team3.Server.domain.user.repository;
 
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, String>{
-    UserEntity findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
     Boolean existsByEmail(String email);
     UserEntity findByEmailAndPassword(String email, String password);
 

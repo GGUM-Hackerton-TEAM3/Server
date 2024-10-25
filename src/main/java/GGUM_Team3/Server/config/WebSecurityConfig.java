@@ -1,44 +1,35 @@
 package GGUM_Team3.Server.config;
 
 
-import GGUM_Team3.Server.sercurity.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import GGUM_Team3.Server.global.sercurity.JwtAccessDeniedHandler;
+import GGUM_Team3.Server.global.sercurity.JwtAuthenticationEntryPoint;
+import GGUM_Team3.Server.global.sercurity.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfigurationSource;
-import java.util.Map;
-import java.util.HashMap;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
-
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    public WebSecurityConfig(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -46,49 +37,32 @@ public class WebSecurityConfig {
     }
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        http.httpBasic(basic -> basic.disable());
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()).disable());
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authorizeHttpRequests(auth -> {
-            try {
-                auth
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .httpBasic(basic -> basic.disable())
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()).disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
+                .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
                                 "/auth/**",
                                 "/h2-console/**",
-
-                                //swagger
+                                "/temp/**",
+                                "/health",
+                                "/swagger",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**"
-                        )
-                        .permitAll();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        http.exceptionHandling(except -> {
-            except.authenticationEntryPoint((request, response, e) -> {
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("status", HttpServletResponse.SC_FORBIDDEN);
-                data.put("message", e.getMessage());
-
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-                objectMapper.writeValue(response.getOutputStream(), data);
-            });
-        });
-
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
-
-        http.authorizeHttpRequests(request -> request.anyRequest().authenticated());
-
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                    )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
     @Bean
@@ -98,7 +72,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");

@@ -15,6 +15,23 @@ spring:
       hibernate:
         show-sql: true
         format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 1234
+
 cloud:
   aws:
     bucket: ${AWS_BUCKET}
@@ -27,3 +44,8 @@ cloud:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
+jwt:
+  secret-key: CwS0ejODKrwKcZFCkXAeScfgixh2dKKtZj4eN5FdJoDHAeXpd7ScsxDqCmTGJtOGhQ75T33L1thACccTgjXuvw==
+
+
