@@ -37,9 +37,8 @@ public class UserService {
         return null;
     }
 
-    public UserEntity getById(String userId) {
-        Optional<UserEntity> user = userRepository.findById(userId);
-        return user.orElse(null);
+    public Optional<UserEntity> getById(String userId) {
+        return userRepository.findById(userId);
     }
 
     public UserEntity getByEmail(String email) {
