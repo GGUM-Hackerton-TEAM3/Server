@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build and Test"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker system prune -a
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.APPLICATION_NAME }}:latest
+            docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.APPLICATION_NAME }}:latest ${{ secrets.APPLICATION_NAME }}-server
+            
+            if [ "$(docker ps -aq -f name=${{ secrets.APPLICATION_NAME }}-server)" ]; then
+              echo "[ ${{ secrets.APPLICATION_NAME }}-server is running ]"
+              docker stop ${{ secrets.APPLICATION_NAME }}-server
+              docker rm ${{ secrets.APPLICATION_NAME }}-server
+            else
+              echo "[ ${{ secrets.APPLICATION_NAME }}-server is not running ]"
+            fi
+            
+            docker run -d --name ${{ secrets.APPLICATION_NAME }}-server -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} ${{ secrets.APPLICATION_NAME }}-server
