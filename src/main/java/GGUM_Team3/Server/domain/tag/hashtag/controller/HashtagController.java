@@ -3,9 +3,9 @@ package GGUM_Team3.Server.domain.tag.hashtag.controller;
 import GGUM_Team3.Server.domain.tag.hashtag.dto.HashtagMeetingsDTO;
 import GGUM_Team3.Server.domain.tag.hashtag.service.HashtagService;
 import GGUM_Team3.Server.domain.tag.hashtag.service.MeetingHashtagService;
-import GGUM_Team3.Server.domain.tempMeeting.dto.TempMeetingDTO;
-import GGUM_Team3.Server.domain.tempMeeting.entity.TempMeetingEntity;
-import GGUM_Team3.Server.domain.tempMeeting.service.TempMeetingService;
+import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
+import GGUM_Team3.Server.meeting.entity.Meeting;
+import GGUM_Team3.Server.meeting.service.MeetingService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bungae/hashtags")
+@RequestMapping("/meeting/hashtags")
 @RequiredArgsConstructor
 public class HashtagController {
 
     private final HashtagService hashtagService;
-    private final TempMeetingService tempMeetingService;
+    private final MeetingService meetingService;
     private final MeetingHashtagService meetingHashtagService;
 
     @GetMapping("/search")
@@ -29,10 +29,10 @@ public class HashtagController {
     }
 
     @PutMapping("/updateHashtags")
-    public ResponseEntity<?> updateHashtagsForMeeting(@RequestBody TempMeetingDTO tempMeetingDTO) {
+    public ResponseEntity<?> updateHashtagsForMeeting(@RequestBody MeetingDTO meetingDTO) {
         try {
-            // 서비스 계층을 통해 해시태그 업데이트 수행
-            TempMeetingEntity updatedMeeting = tempMeetingService.updateMeetingHashtags(tempMeetingDTO);
+            // 해시태그 업데이트 수행
+            Meeting updatedMeeting = meetingService.updateMeetingHashtags(meetingDTO);
             return ResponseEntity.ok(updatedMeeting);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -44,16 +44,11 @@ public class HashtagController {
     }
 
     @PutMapping("/addHashtags")
-    public ResponseEntity<?> addHashtagsToMeeting(@RequestBody TempMeetingDTO tempMeetingDTO) {
+    public ResponseEntity<?> addHashtagsToMeeting(@RequestBody MeetingDTO meetingDTO) {
         try {
-            // TempMeetingEntity 객체를 가져온다.
-            TempMeetingEntity meeting = tempMeetingService.getMeetingByTitle(tempMeetingDTO.getTempMeetingTitle());
-
-            // 해시태그 리스트를 TempMeetingDTO에서 가져온다.
-            List<String> hashtags = tempMeetingDTO.getHashtags();
-
-            // MeetingHashtagService를 이용해 해시태그들을 미팅에 추가한다.
-            ResponseEntity<TempMeetingDTO> addMeetingResponse = meetingHashtagService.addHashtagsToMeeting(meeting, hashtags);
+            Meeting meeting = meetingService.getMeetingByTitle(meetingDTO.getId());
+            List<String> hashtags = meetingDTO.getHashtags();
+            ResponseEntity<MeetingDTO> addMeetingResponse = meetingHashtagService.addHashtagsToMeeting(meeting, hashtags);
 
             return addMeetingResponse; // 그대로 반환
         } catch (Exception e) {

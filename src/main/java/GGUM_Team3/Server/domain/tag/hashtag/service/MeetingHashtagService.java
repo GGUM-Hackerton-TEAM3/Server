@@ -5,9 +5,9 @@ import GGUM_Team3.Server.domain.tag.hashtag.dto.SearchForMeetingWithHashtagsDTO;
 import GGUM_Team3.Server.domain.tag.hashtag.entity.HashtagEntity;
 import GGUM_Team3.Server.domain.tag.hashtag.entity.MeetingHashtagEntity;
 import GGUM_Team3.Server.domain.tag.hashtag.repository.MeetingHashtagRepository;
-import GGUM_Team3.Server.domain.tempMeeting.dto.TempMeetingDTO;
-import GGUM_Team3.Server.domain.tempMeeting.entity.TempMeetingEntity;
-import GGUM_Team3.Server.domain.tempMeeting.repository.TempMeetingRepository;
+import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
+import GGUM_Team3.Server.meeting.entity.Meeting;
+import GGUM_Team3.Server.meeting.repository.MeetingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,44 +22,35 @@ import java.util.stream.Collectors;
 public class MeetingHashtagService {
     private final MeetingHashtagRepository meetingHashtagRepository;
     private final HashtagService hashtagService;
+    private final MeetingRepository meetingRepository;
 
-    private final TempMeetingRepository tempMeetingRepository;
-
-    public MeetingHashtagService(MeetingHashtagRepository meetingHashtagRepository, HashtagService hashtagService, TempMeetingRepository tempMeetingRepository) {
+    public MeetingHashtagService(MeetingHashtagRepository meetingHashtagRepository, HashtagService hashtagService, MeetingRepository meetingRepository) {
         this.meetingHashtagRepository = meetingHashtagRepository;
         this.hashtagService = hashtagService;
-        this.tempMeetingRepository = tempMeetingRepository;
+        this.meetingRepository = meetingRepository;
     }
 
-    public ResponseEntity<TempMeetingDTO> addHashtagsToMeeting(TempMeetingEntity meeting, List<String> newHashtags) {
+    public ResponseEntity<MeetingDTO> addHashtagsToMeeting(Meeting meeting, List<String> newHashtags) {
         try {
-            // 이미 존재하는 해시태그 이름들 가져오기
             List<String> existingHashtagNames = meeting.getMeetingHashtagEntities().stream()
                     .map(meetingHashtagEntity -> meetingHashtagEntity.getHashtagEntity().getHashtagName())
                     .collect(Collectors.toList());
 
-            // 새로운 해시태그 중 기존에 없는 것만 추가
             List<String> hashtagsToAdd = newHashtags.stream()
                     .filter(hashtag -> !existingHashtagNames.contains(hashtag))
                     .collect(Collectors.toList());
 
-            // 해시태그 추가
             hashtagsToAdd.forEach(hashtagName -> {
                 HashtagEntity hashtagEntity = hashtagService.createOrGetHashtag(hashtagName);
                 MeetingHashtagEntity meetingHashtagEntity = new MeetingHashtagEntity();
-                meetingHashtagEntity.setTempMeetingEntity(meeting);
+                meetingHashtagEntity.setMeeting(meeting);
                 meetingHashtagEntity.setHashtagEntity(hashtagEntity);
-                meeting.getMeetingHashtagEntities().add(meetingHashtagEntity);  // 기존 컬렉션에 새로운 해시태그 엔티티 추가
+                meeting.getMeetingHashtagEntities().add(meetingHashtagEntity);
             });
 
-            // 변경된 미팅 엔티티를 저장
-            tempMeetingRepository.save(meeting);
+            meetingRepository.save(meeting);
 
-            // DTO로 변환하여 반환
-            TempMeetingDTO responseDTO = new TempMeetingDTO();
-            responseDTO.setTempMeetingId(meeting.getTempMeetingId());
-            responseDTO.setTempMeetingTitle(meeting.getTempMeetingTitle());
-
+            MeetingDTO responseDTO = MeetingDTO.fromEntity(meeting);
             List<String> updatedHashtagsNames = meeting.getMeetingHashtagEntities().stream()
                     .map(meetingHashtagEntity -> meetingHashtagEntity.getHashtagEntity().getHashtagName())
                     .collect(Collectors.toList());
@@ -72,27 +63,21 @@ public class MeetingHashtagService {
         }
     }
 
-
-
-    // 해시태그 수정 메서드
-    public ResponseEntity<TempMeetingEntity> updateHashtagsForMeeting(TempMeetingEntity meeting, List<String> newHashtags) {
+    public ResponseEntity<Meeting> updateHashtagsForMeeting(Meeting meeting, List<String> newHashtags) {
         try {
-            // 기존 해시태그 삭제
-            List<MeetingHashtagEntity> existingHashtags = meetingHashtagRepository.findByTempMeetingEntity(meeting);
+            List<MeetingHashtagEntity> existingHashtags = meetingHashtagRepository.findByMeeting(meeting);
             meetingHashtagRepository.deleteAll(existingHashtags);
 
-            // 새로운 해시태그 추가
             newHashtags.forEach(hashtagName -> {
                 HashtagEntity hashtagEntity = hashtagService.createOrGetHashtag(hashtagName);
                 MeetingHashtagEntity meetingHashtagEntity = new MeetingHashtagEntity();
-                meetingHashtagEntity.setTempMeetingEntity(meeting);
+                meetingHashtagEntity.setMeeting(meeting);
                 meetingHashtagEntity.setHashtagEntity(hashtagEntity);
                 meetingHashtagRepository.save(meetingHashtagEntity);
             });
 
-            // 미팅 객체에 새로운 해시태그들 추가
             meeting.setMeetingHashtagEntities(
-                    meetingHashtagRepository.findByTempMeetingEntity(meeting)
+                    meetingHashtagRepository.findByMeeting(meeting)
             );
 
             return new ResponseEntity<>(meeting, HttpStatus.OK);
@@ -103,26 +88,23 @@ public class MeetingHashtagService {
     }
 
     public HashtagMeetingsDTO findMeetingsByHashtag(String hashtagName) {
-        // 해시태그 이름을 통해 관련된 MeetingHashtagEntity들을 조회
-        List<TempMeetingEntity> tempMeetings = meetingHashtagRepository.findByHashtagEntity_HashtagName(hashtagName)
+        List<Meeting> meetings = meetingHashtagRepository.findByHashtagEntity_HashtagName(hashtagName)
                 .stream()
-                .map(MeetingHashtagEntity::getTempMeetingEntity)
-                .distinct() // 중복 제거
+                .map(MeetingHashtagEntity::getMeeting)
+                .distinct()
                 .collect(Collectors.toList());
 
-        // 검색된 미팅이 없으면 ResponseStatusException 던짐
-        if (tempMeetings.isEmpty()) {
+        if (meetings.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해시태그 '" + hashtagName + "'에 해당하는 모임이 없습니다.");
         }
 
-        // TempMeetingEntity를 SearchForMeetingWithHashtagsDTO로 변환
-        List<SearchForMeetingWithHashtagsDTO> searchForMeetingWithHashtagsDTOS = tempMeetings.stream()
-                .map(tempMeeting -> new SearchForMeetingWithHashtagsDTO(
-                        tempMeeting.getTempMeetingId(),
-                        tempMeeting.getTempMeetingTitle()
+        List<SearchForMeetingWithHashtagsDTO> searchResults = meetings.stream()
+                .map(meeting -> new SearchForMeetingWithHashtagsDTO(
+                        meeting.getId(), // 이거 수정햇음 meeting 은 string형식의 uuid임
+                        meeting.getTitle()
                 ))
                 .collect(Collectors.toList());
 
-        return new HashtagMeetingsDTO(hashtagName, searchForMeetingWithHashtagsDTOS);
+        return new HashtagMeetingsDTO(hashtagName, searchResults);
     }
 }

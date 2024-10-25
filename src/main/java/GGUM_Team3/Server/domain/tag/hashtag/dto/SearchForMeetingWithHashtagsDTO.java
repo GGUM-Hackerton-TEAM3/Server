@@ -10,11 +10,11 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 public class SearchForMeetingWithHashtagsDTO {
-    private UUID tempMeetingId;
+    private String MeetingId;
     private String tempMeetingTitle;
 
-    public SearchForMeetingWithHashtagsDTO(UUID tempMeetingId, String tempMeetingTitle) {
-        this.tempMeetingId = tempMeetingId;
+    public SearchForMeetingWithHashtagsDTO(String MeetingId, String tempMeetingTitle) {
+        this.MeetingId = MeetingId;
         this.tempMeetingTitle = tempMeetingTitle;
     }
 }

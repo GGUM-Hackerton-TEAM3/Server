@@ -1,6 +1,7 @@
 // 모임 관련 엔티티
 package GGUM_Team3.Server.meeting.entity;
 
+import GGUM_Team3.Server.domain.tag.hashtag.entity.MeetingHashtagEntity;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,4 +43,10 @@ public class Meeting {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<UserEntity> participants;
+
+
+    // 해시태그와의 연관관계 추가
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MeetingHashtagEntity> meetingHashtagEntities;
+
 }

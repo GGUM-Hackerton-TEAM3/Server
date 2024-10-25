@@ -1,6 +1,6 @@
 package GGUM_Team3.Server.domain.tag.hashtag.entity;
 
-import GGUM_Team3.Server.domain.tempMeeting.entity.TempMeetingEntity;
+import GGUM_Team3.Server.meeting.entity.Meeting;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,14 +24,14 @@ public class MeetingHashtagEntity {
     @ManyToOne
     @JoinColumn(name = "meetingId", nullable = false)
     @JsonBackReference
-    private TempMeetingEntity tempMeetingEntity;
+    private Meeting meeting;
 
     @ManyToOne
     @JoinColumn(name = "hashtagId", nullable = false)
     private HashtagEntity hashtagEntity;
 
-    public MeetingHashtagEntity(TempMeetingEntity tempMeetingEntity, HashtagEntity hashtagEntity) {
-        this.tempMeetingEntity = tempMeetingEntity;
+    public MeetingHashtagEntity(Meeting meeting, HashtagEntity hashtagEntity) {
+        this.meeting = meeting;
         this.hashtagEntity = hashtagEntity;
     }
 
