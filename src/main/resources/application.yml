@@ -1,3 +1,6 @@
+server:
+  port: 8080
+  forward-headers-strategy: framework
 spring:
   datasource:
     url: jdbc:h2:mem:oneul_db
@@ -47,5 +50,11 @@ logging.level:
 
 jwt:
   secret-key: CwS0ejODKrwKcZFCkXAeScfgixh2dKKtZj4eN5FdJoDHAeXpd7ScsxDqCmTGJtOGhQ75T33L1thACccTgjXuvw==
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 
 
