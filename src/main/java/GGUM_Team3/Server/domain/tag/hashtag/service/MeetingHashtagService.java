@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class MeetingHashtagService {
+
     private final MeetingHashtagRepository meetingHashtagRepository;
     private final HashtagService hashtagService;
     private final MeetingRepository meetingRepository;

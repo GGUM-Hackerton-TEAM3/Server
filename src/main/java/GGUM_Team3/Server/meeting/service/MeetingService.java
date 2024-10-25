@@ -43,7 +43,7 @@ public class MeetingService {
     private MeetingHashtagRepository meetingHashtagRepository;
 
 
-    public Meeting createMeeting(MeetingDTO meetingDTO) throws BindException {
+    public MeetingDTO createMeeting(MeetingDTO meetingDTO) throws BindException {
         if (meetingDTO.getTitle() == null || meetingDTO.getTitle().isEmpty()) {
             BindException bindException = new BindException(meetingDTO, "meetingDTO");
             bindException.rejectValue("title", "NotEmpty", "Meeting title cannot be null or empty");
@@ -87,8 +87,9 @@ public class MeetingService {
 
         meetingHashtagRepository.saveAll(meetingHashtagEntities);
         meeting.setMeetingHashtagEntities(meetingHashtagEntities);
+        meetingRepository.save(meeting);
 
-        return meetingRepository.save(meeting);
+        return  MeetingDTO.fromEntity(meeting);
     }
 
     public List<MeetingDTO> getAllMeetings() {

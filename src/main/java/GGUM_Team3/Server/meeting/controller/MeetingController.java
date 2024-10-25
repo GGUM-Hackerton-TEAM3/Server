@@ -5,6 +5,7 @@ import GGUM_Team3.Server.meeting.service.MeetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,10 +17,15 @@ public class MeetingController {
     @Autowired
     private MeetingService meetingService;
 
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public ResponseEntity<MeetingDTO> createMeeting(@RequestBody MeetingDTO meetingDTO) {
-        return ResponseEntity.ok(meetingService.createMeeting(meetingDTO));
+    public ResponseEntity<?> createMeeting(@RequestBody MeetingDTO meetingDTO) {
+        try {
+            MeetingDTO createdMeeting = meetingService.createMeeting(meetingDTO);
+            return ResponseEntity.ok(createdMeeting);
+        } catch (BindException e) {
+            return ResponseEntity.badRequest().body("Meeting title cannot be null or empty.");
+        }
     }
 
     @GetMapping("/search")
