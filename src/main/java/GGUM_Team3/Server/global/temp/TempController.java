@@ -49,7 +49,7 @@ public class TempController { //todo: 테스트를 위함. 개발 완료 후 삭
 
         return keysWithValuesAndTTL;
     }
-
+  
     @GetMapping("/health")
     public ResponseEntity<String> checkHealth() {
         return ResponseEntity.ok("Alive");
