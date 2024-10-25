@@ -31,6 +31,37 @@ public class MeetingController {
         return ResponseEntity.ok(meetingService.searchMeetings(keyword));
     }
 
+    // 카테고리별 모임 조회
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<MeetingDTO>> getMeetingsByCategory(@PathVariable String categoryId) {
+        return ResponseEntity.ok(meetingService.getMeetingsByCategory(categoryId));
+    }
+
+    // 지역별 모임 조회
+    @GetMapping("/region/{region}")
+    public ResponseEntity<List<MeetingDTO>> getMeetingsByRegion(@PathVariable String region) {
+        return ResponseEntity.ok(meetingService.getMeetingsByRegion(region));
+    }
+
+    // 태그로 모임 조회
+    @GetMapping("/tag/{tag}")
+    public ResponseEntity<List<MeetingDTO>> getMeetingsByTag(@PathVariable String tag) {
+        return ResponseEntity.ok(meetingService.getMeetingsByTag(tag));
+    }
+
+    // 좋아요가 많은 순으로 모임 조회
+    @GetMapping("/top-liked")
+    public ResponseEntity<List<MeetingDTO>> getTopLikedMeetings() {
+        return ResponseEntity.ok(meetingService.getTopLikedMeetings());
+    }
+
+    // 특정 사용자가 좋아요한 모임 조회
+    @GetMapping("/liked-by-user/{userId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<MeetingDTO>> getMeetingsLikedByUser(@PathVariable String userId) {
+        return ResponseEntity.ok(meetingService.getMeetingsLikedByUser(userId));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<MeetingDTO> getMeetingById(@PathVariable String id) {
         return ResponseEntity.ok(meetingService.getMeetingById(id));

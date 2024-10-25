@@ -7,6 +7,7 @@ import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
 import GGUM_Team3.Server.meeting.entity.Meeting;
 import GGUM_Team3.Server.meeting.repository.MeetingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class MeetingService {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근가능
     public MeetingDTO createMeeting(MeetingDTO meetingDTO) {
         Meeting meeting = Meeting.builder()
                 .title(meetingDTO.getTitle())
@@ -32,6 +34,38 @@ public class MeetingService {
                 .build();
         Meeting savedMeeting = meetingRepository.save(meeting);
         return MeetingDTO.fromEntity(savedMeeting);
+    }
+
+    public List<MeetingDTO> getMeetingsByCategory(String categoryId) {
+        return meetingRepository.findByCategoryId(categoryId).stream()
+                .map(MeetingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<MeetingDTO> getMeetingsByRegion(String region) {
+        return meetingRepository.findByRegion(region).stream()
+                .map(MeetingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<MeetingDTO> getMeetingsByTag(String tag) {
+        return meetingRepository.findByTagsContaining(tag).stream()
+                .map(MeetingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<MeetingDTO> getTopLikedMeetings() {
+        return meetingRepository.findAllByOrderByLikesCountDesc().stream()
+                .map(MeetingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<MeetingDTO> getMeetingsLikedByUser(String userId) {
+        UserEntity user = userService.getById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return meetingRepository.findByLikesContaining(user).stream()
+                .map(MeetingDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public List<MeetingDTO> getAllMeetings() {
