@@ -58,7 +58,12 @@ public class WebSecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/swagger-resources/**"
+                                "/swagger-resources/**",
+
+                                // 해시태그용
+                                "/bungae/meetings/**",
+                                "/bungae/hashtags/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                     )
