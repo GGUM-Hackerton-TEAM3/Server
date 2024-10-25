@@ -28,7 +28,7 @@ public class MeetingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MeetingDTO> getMeetingById(@PathVariable UUID id) {
+    public ResponseEntity<MeetingDTO> getMeetingById(@PathVariable String id) {
         return ResponseEntity.ok(meetingService.getMeetingById(id));
     }
 
@@ -39,13 +39,13 @@ public class MeetingController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/join")
-    public ResponseEntity<MeetingDTO> joinMeeting(@PathVariable UUID id, @RequestParam UUID userId) {
+    public ResponseEntity<MeetingDTO> joinMeeting(@PathVariable String id, @RequestParam String userId) {
         return ResponseEntity.ok(meetingService.joinMeeting(id, userId));
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/leave")
-    public ResponseEntity<MeetingDTO> leaveMeeting(@PathVariable UUID id, @RequestParam UUID userId) {
+    public ResponseEntity<MeetingDTO> leaveMeeting(@PathVariable String id, @RequestParam String userId) {
         return ResponseEntity.ok(meetingService.leaveMeeting(id, userId));
     }
 }

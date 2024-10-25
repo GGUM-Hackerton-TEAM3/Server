@@ -3,10 +3,7 @@ package GGUM_Team3.Server.meeting.entity;
 
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Data
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Meeting {
@@ -25,7 +23,7 @@ public class Meeting {
     private String id;
 
     @Column(nullable = false)
-    private UUID creatorId;
+    private String creatorId;
 
     @Column(nullable = false)
     private String title;
@@ -34,8 +32,8 @@ public class Meeting {
     private LocalDateTime startTime;
     private String region; // 지역 필드
     private String notice; // 공지 필드
-    private UUID chatRoomId; // 채팅방ID 필드
-    private UUID categoryId; // 카테고리ID 필드
+    private String chatRoomId; // 채팅방ID 필드
+    private String categoryId; // 카테고리ID 필드
 
     @ManyToMany
     @JoinTable(
