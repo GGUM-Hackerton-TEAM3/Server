@@ -54,8 +54,7 @@ public class WebSecurityConfig {
                                 "/h2-console/**",
                                 "/temp/**",
                                 "/health",
-
-                                //swagger
+                                "/swagger",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
