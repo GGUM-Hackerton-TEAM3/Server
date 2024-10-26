@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,14 +23,15 @@ public class MeetingController {
     private final MeetingService meetingService;
     private final TokenProvider tokenProvider;
 
-    @Operation(summary = "모임 생성", description = "새로운 모임을 생성합니다.")
     @PostMapping("/create")
-    public ResponseEntity<?> createMeeting(@RequestBody MeetingDTO meetingDTO) {
+    public ResponseEntity<?> createMeeting(
+            @RequestPart MeetingDTO meetingDTO,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
-            MeetingDTO createdMeeting = meetingService.createMeeting(meetingDTO);
+            MeetingDTO createdMeeting = meetingService.createMeeting(meetingDTO, imageFile);
             return ResponseEntity.ok(createdMeeting);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Meeting title cannot be null or empty.");
+            return ResponseEntity.badRequest().body("Error creating meeting: " + e.getMessage());
         }
     }
 

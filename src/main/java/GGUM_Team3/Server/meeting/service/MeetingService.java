@@ -1,5 +1,6 @@
 package GGUM_Team3.Server.meeting.service;
 
+import GGUM_Team3.Server.domain.image.service.ImageService;
 import GGUM_Team3.Server.tag.category.entity.CategoryEntity;
 import GGUM_Team3.Server.tag.category.repository.CategoryRepository;
 import GGUM_Team3.Server.tag.hashtag.entity.HashtagEntity;
@@ -21,6 +22,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +48,10 @@ public class MeetingService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public MeetingDTO createMeeting(MeetingDTO meetingDTO) throws BindException {
+    @Autowired
+    private ImageService imageService;
+
+    public MeetingDTO createMeeting(MeetingDTO meetingDTO, MultipartFile imageFile) throws BindException {
         if (meetingDTO.getTitle() == null || meetingDTO.getTitle().isEmpty()) {
             BindException bindException = new BindException(meetingDTO, "meetingDTO");
             bindException.rejectValue("title", "NotEmpty", "Meeting title cannot be null or empty");
@@ -60,12 +65,18 @@ public class MeetingService {
         CategoryEntity category = categoryRepository.findById(meetingDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + meetingDTO.getCategoryId()));
 
+        // 이미지 파일을 업로드하고 URL을 가져옴
+        String imageUrl = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageUrl = imageService.saveImage(imageFile); // S3에 저장 후 URL 반환
+        }
+
         Meeting meeting;
         try {
             meeting = meetingRepository.saveAndFlush(
                     Meeting.builder()
                             .title(meetingDTO.getTitle())
-                            .creatorId(meetingDTO.getCreatorId()) // creatorId도 받아와야 한다.
+                            .creatorId(meetingDTO.getCreatorId())
                             .description(meetingDTO.getDescription())
                             .maxParticipants(meetingDTO.getMaxParticipants())
                             .startTime(meetingDTO.getStartTime())
@@ -73,6 +84,7 @@ public class MeetingService {
                             .notice(meetingDTO.getNotice())
                             .chatRoomId(meetingDTO.getChatRoomId())
                             .category(category)
+                            .imageUrl(imageUrl) // 이미지 URL 설정
                             .build()
             );
         } catch (DataIntegrityViolationException e) {
@@ -81,6 +93,7 @@ public class MeetingService {
             throw new IllegalArgumentException("Constraint violation: " + e.getMessage());
         }
 
+        // 해시태그 엔티티 생성 및 저장
         List<MeetingHashtagEntity> meetingHashtagEntities = meetingDTO
                 .getHashtags()
                 .stream()
@@ -98,8 +111,9 @@ public class MeetingService {
         meeting.setMeetingHashtagEntities(meetingHashtagEntities);
         meetingRepository.save(meeting);
 
-        return  MeetingDTO.fromEntity(meeting);
+        return MeetingDTO.fromEntity(meeting);
     }
+
     public MeetingDTO updateMeeting(String meetingId, MeetingDTO meetingDTO) {
         Meeting meeting = meetingRepository.findById(meetingId)
                 .orElseThrow(() -> new EntityNotFoundException("Meeting not found"));
@@ -195,4 +209,6 @@ public class MeetingService {
         Meeting updatedMeeting = meetingRepository.save(meeting);
         return MeetingDTO.fromEntity(updatedMeeting);
     }
+
+
 }

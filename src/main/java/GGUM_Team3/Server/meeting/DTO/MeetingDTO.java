@@ -43,7 +43,8 @@ public class MeetingDTO {
     private String notice;
     private String chatRoomId;
     private List<UserDTO> participants;
-    private List<String> hashtags; // 해시태그 필드 추가
+    private List<String> hashtags;
+    private String imageUrl; // 이미지 URL 필드 추가
 
     public static MeetingDTO fromEntity(Meeting meeting) {
         return MeetingDTO.builder()
@@ -61,14 +62,14 @@ public class MeetingDTO {
                         ? meeting.getParticipants().stream()
                         .map(UserDTO::fromEntity)
                         .collect(Collectors.toList())
-                        : new ArrayList<>()) // participants가 null일 경우 빈 리스트로 처리
+                        : new ArrayList<>())
                 .hashtags(meeting.getMeetingHashtagEntities() != null
                         ? meeting.getMeetingHashtagEntities().stream()
                         .map(hashtagEntity -> hashtagEntity.getHashtagEntity().getHashtagName())
                         .collect(Collectors.toList())
-                        : new ArrayList<>()) // meetingHashtagEntities가 null일 경우 빈 리스트로 처리
+                        : new ArrayList<>())
+                .imageUrl(meeting.getImageUrl()) // 이미지 URL 설정
                 .build();
     }
 }
-
 

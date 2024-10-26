@@ -30,15 +30,14 @@ public class Meeting {
     @JoinColumn(name = "categoryId", nullable = false)
     private CategoryEntity category;
 
-
     @Column(nullable = false)
     private String title;
     private String description;
     private int maxParticipants;
     private LocalDateTime startTime;
-    private String region; // 지역 필드
-    private String notice; // 공지 필드
-    private String chatRoomId; // 채팅방ID 필드
+    private String region;
+    private String notice;
+    private String chatRoomId;
 
     @ManyToMany
     @JoinTable(
@@ -48,14 +47,14 @@ public class Meeting {
     )
     private List<UserEntity> participants;
 
-
-    // 해시태그와의 연관관계 추가
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingHashtagEntity> meetingHashtagEntities;
+
+    private String imageUrl; // 이미지 URL 필드 추가
 
     public Meeting(String meetingTitle, CategoryEntity category) {
         this.title = meetingTitle;
         this.category = category;
     }
-
 }
+
