@@ -1,5 +1,6 @@
 package GGUM_Team3.Server.tag.category.controller;
 
+import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
 import GGUM_Team3.Server.meeting.entity.Meeting;
 import GGUM_Team3.Server.tag.category.dto.CategoryDTO;
 import GGUM_Team3.Server.tag.category.entity.CategoryEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -65,10 +67,16 @@ public class CategoryController {
     }
 
     @GetMapping("/search/meetings")
-    public ResponseEntity<List<Meeting>> searchForMeetingWithCategory(@RequestParam String categoryName) {
+    public ResponseEntity<List<MeetingDTO>> searchForMeetingWithCategory(@RequestParam String categoryName) {
         try {
             List<Meeting> meetings = categoryService.searchForMeetingWithCategory(categoryName);
-            return ResponseEntity.ok(meetings);
+
+            // Meeting 리스트를 MeetingDTO 리스트로 변환
+            List<MeetingDTO> meetingDTOs = meetings.stream()
+                    .map(MeetingDTO::fromEntity)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(meetingDTOs);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "카테고리로 미팅 검색 중 오류가 발생했습니다.", e);
         }

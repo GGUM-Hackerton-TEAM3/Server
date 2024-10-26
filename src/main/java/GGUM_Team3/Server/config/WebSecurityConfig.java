@@ -58,6 +58,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
+                                "/**",
                                 "/api/auth/**",
                                 "/h2-console/**",
                                 "/temp/**",

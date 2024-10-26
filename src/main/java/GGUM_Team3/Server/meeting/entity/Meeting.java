@@ -30,6 +30,7 @@ public class Meeting {
     @JoinColumn(name = "categoryId", nullable = false)
     private CategoryEntity category;
 
+
     @Column(nullable = false)
     private String title;
     private String description;
