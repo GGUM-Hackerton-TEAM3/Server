@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
-                                "/auth/**",
+                                "/api/auth/**",
                                 "/h2-console/**",
                                 "/temp/**",
                                 "/actuator/**",

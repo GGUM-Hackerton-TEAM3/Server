@@ -1,6 +1,7 @@
 package GGUM_Team3.Server.user.controller;
 
 import GGUM_Team3.Server.domain.auth.dto.request.SignupRequest;
+import GGUM_Team3.Server.domain.auth.service.AuthService;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import GGUM_Team3.Server.domain.user.service.UserService;
 import GGUM_Team3.Server.global.sercurity.TokenProvider;
@@ -32,6 +33,9 @@ public class AuthControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @Autowired
+    private AuthService authService;
 
     @MockBean
     private TokenProvider tokenProvider;
@@ -91,7 +95,7 @@ public class AuthControllerTest {
                 .password(passwordEncoder.encode(signupRequest.getPassword()))
                 .build();
 
-        Mockito.when(userService.getByCredentials(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
+        Mockito.when(authService.getByCredentials(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
                 .thenReturn(existingUser);
 
         String jwtToken = "mock-jwt-token";
@@ -108,7 +112,7 @@ public class AuthControllerTest {
     @Test
     public void testSigninWithInvalidCredentials() throws Exception {
         // Mock 로그인 실패 시나리오 설정
-        Mockito.when(userService.getByCredentials(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
+        Mockito.when(authService.getByCredentials(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
                 .thenReturn(null);
 
         mockMvc.perform(post("/auth/signin")
