@@ -78,6 +78,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	// 'testRuntimeOnly 'org.junit.platform:junit-platform-launcher'' 제거
+
+	// 임시 파일 컴파일에서 제외
+	sourceSets {
+		main {
+			java {
+				exclude '**/GGUM_Team3/Server/tempMeeting/**'
+			}
+		}
+	}
 }
 
 tasks.named('test') {

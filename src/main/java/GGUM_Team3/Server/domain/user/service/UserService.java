@@ -1,7 +1,8 @@
 package GGUM_Team3.Server.domain.user.service;
 
-import GGUM_Team3.Server.domain.image.service.ImageService;
 import GGUM_Team3.Server.domain.user.repository.UserRepository;
+
+import GGUM_Team3.Server.domain.image.service.ImageService;
 import GGUM_Team3.Server.domain.auth.dto.request.LoginRequest;
 import GGUM_Team3.Server.domain.auth.dto.response.LoginResponse;
 import GGUM_Team3.Server.domain.auth.dto.request.SignupRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -93,8 +95,9 @@ public class UserService {
         return null;
     }
 
-    public UserEntity getById(String userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+
+    public Optional<UserEntity> getById(String userId) {
+        return userRepository.findById(userId);
     }
 
     public UserEntity getByEmail(String email) {
@@ -122,7 +125,7 @@ public class UserService {
 
     @Transactional
     public void signupWithGoogle(final String userId, final SignupRequest signupRequest) {
-        UserEntity user = getById(userId);
+        UserEntity user = getById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         user.updateProfile(
                 signupRequest,
                 signupRequest.getProfileImage() != null ? imageService.saveImage(signupRequest.getProfileImage()) : null,

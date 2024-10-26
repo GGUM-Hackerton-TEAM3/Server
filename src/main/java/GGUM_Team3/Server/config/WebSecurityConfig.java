@@ -58,7 +58,11 @@ public class WebSecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/swagger-resources/**"
+                                "/swagger-resources/**",
+
+                                // 테스트용 CSRF 허용
+                                "/api/meetings/**",
+                                "/meeting/hashtags/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                     )
