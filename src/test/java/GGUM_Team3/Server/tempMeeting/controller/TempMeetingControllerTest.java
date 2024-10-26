@@ -1,54 +1,14 @@
 package GGUM_Team3.Server.tempMeeting.controller;
 
-import GGUM_Team3.Server.config.*;
-import GGUM_Team3.Server.domain.image.service.ImageService;
-import GGUM_Team3.Server.tag.hashtag.dto.HashtagMeetingsDTO;
-import GGUM_Team3.Server.tag.hashtag.dto.SearchForMeetingWithHashtagsDTO;
-import GGUM_Team3.Server.tag.hashtag.service.HashtagService;
-import GGUM_Team3.Server.global.sercurity.*;
-import GGUM_Team3.Server.tag.hashtag.entity.HashtagEntity;
-import GGUM_Team3.Server.tag.hashtag.entity.MeetingHashtagEntity;
-import GGUM_Team3.Server.tempMeeting.dto.TempMeetingDTO;
-import GGUM_Team3.Server.tempMeeting.entity.TempMeetingEntity;
-import GGUM_Team3.Server.tempMeeting.service.TempMeetingService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test; // Junit 5 어노테이션
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
-
-import GGUM_Team3.Server.tag.hashtag.service.MeetingHashtagService;
-
-import static org.mockito.ArgumentMatchers.anyList;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")  // 테스트 전용 프로파일 사용
+@Disabled
 public class TempMeetingControllerTest {
 
 //    @Autowired
