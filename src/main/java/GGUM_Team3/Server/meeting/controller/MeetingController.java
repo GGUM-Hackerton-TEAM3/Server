@@ -86,4 +86,12 @@ public class MeetingController {
         String userId = tokenProvider.validateAndGetUserId(token);
         return ResponseEntity.ok(meetingService.leaveMeeting(id, userId));
     }
+
+    // 전체 모임 조회 API
+    @Operation(summary = "전체 모임 조회", description = "모든 모임 목록을 조회합니다.")
+    @GetMapping("/all")
+    public ResponseEntity<List<MeetingDTO>> getAllMeetings() {
+        List<MeetingDTO> allMeetings = meetingService.getAllMeetings();
+        return ResponseEntity.ok(allMeetings);
+    }
 }
