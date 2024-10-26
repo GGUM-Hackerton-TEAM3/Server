@@ -8,6 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ public class MeetingController {
     private MeetingService meetingService;
 
     //@PreAuthorize("isAuthenticated()")
+    // 테스트 완료
     @PostMapping("/create")
     public ResponseEntity<?> createMeeting(@RequestBody MeetingDTO meetingDTO) {
         try {
@@ -28,10 +31,18 @@ public class MeetingController {
         }
     }
 
+    // 테스트 완료
     @GetMapping("/search")
     public ResponseEntity<List<MeetingDTO>> searchMeetings(@RequestParam String keyword) {
+        // URL 디코딩을 적용하여 공백 처리 가능하도록 수정
+        try {
+            keyword = URLDecoder.decode(keyword, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(meetingService.searchMeetings(keyword));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<MeetingDTO> getMeetingById(@PathVariable String id) {

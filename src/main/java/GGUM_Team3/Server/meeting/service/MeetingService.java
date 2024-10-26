@@ -9,7 +9,7 @@ import GGUM_Team3.Server.tag.hashtag.repository.HashtagRepository;
 import GGUM_Team3.Server.tag.hashtag.repository.MeetingHashtagRepository;
 import GGUM_Team3.Server.tag.hashtag.service.MeetingHashtagService;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
-import GGUM_Team3.Server.domain.user.repository.UserService;
+import GGUM_Team3.Server.domain.user.service.UserService;
 import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
 import GGUM_Team3.Server.meeting.entity.Meeting;
 import GGUM_Team3.Server.meeting.repository.MeetingRepository;
