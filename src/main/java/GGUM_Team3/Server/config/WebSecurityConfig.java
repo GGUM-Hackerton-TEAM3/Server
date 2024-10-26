@@ -76,8 +76,8 @@ public class WebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.setAllowedOrigins(List.of("http://localhost:3000","http://codi.page"));
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("https://codi.page");
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
