@@ -1,13 +1,15 @@
 // 모임 서비스
 package GGUM_Team3.Server.meeting.service;
 
-import GGUM_Team3.Server.domain.tag.hashtag.entity.HashtagEntity;
-import GGUM_Team3.Server.domain.tag.hashtag.entity.MeetingHashtagEntity;
-import GGUM_Team3.Server.domain.tag.hashtag.repository.HashtagRepository;
-import GGUM_Team3.Server.domain.tag.hashtag.repository.MeetingHashtagRepository;
-import GGUM_Team3.Server.domain.tag.hashtag.service.MeetingHashtagService;
+import GGUM_Team3.Server.tag.category.entity.CategoryEntity;
+import GGUM_Team3.Server.tag.category.repository.CategoryRepository;
+import GGUM_Team3.Server.tag.hashtag.entity.HashtagEntity;
+import GGUM_Team3.Server.tag.hashtag.entity.MeetingHashtagEntity;
+import GGUM_Team3.Server.tag.hashtag.repository.HashtagRepository;
+import GGUM_Team3.Server.tag.hashtag.repository.MeetingHashtagRepository;
+import GGUM_Team3.Server.tag.hashtag.service.MeetingHashtagService;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
-import GGUM_Team3.Server.domain.user.service.UserService;
+import GGUM_Team3.Server.domain.user.repository.UserService;
 import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
 import GGUM_Team3.Server.meeting.entity.Meeting;
 import GGUM_Team3.Server.meeting.repository.MeetingRepository;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.validation.BindException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -42,6 +43,9 @@ public class MeetingService {
     @Autowired
     private MeetingHashtagRepository meetingHashtagRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
 
     public MeetingDTO createMeeting(MeetingDTO meetingDTO) throws BindException {
         if (meetingDTO.getTitle() == null || meetingDTO.getTitle().isEmpty()) {
@@ -49,27 +53,33 @@ public class MeetingService {
             bindException.rejectValue("title", "NotEmpty", "Meeting title cannot be null or empty");
             throw bindException;
         }
-
-        if (!meetingRepository.findByTitleContaining(meetingDTO.getTitle()).isEmpty()) {
+        if (meetingRepository.findByTitle(meetingDTO.getTitle()).isPresent()) {
             throw new IllegalArgumentException("Meeting title already exists");
         }
+
+        // categoryId를 사용하여 카테고리 엔티티 조회
+        CategoryEntity category = categoryRepository.findById(meetingDTO.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + meetingDTO.getCategoryId()));
 
         Meeting meeting;
         try {
             meeting = meetingRepository.saveAndFlush(
                     Meeting.builder()
                             .title(meetingDTO.getTitle())
+                            .creatorId(meetingDTO.getCreatorId()) // creatorId도 받아와야 한다.
                             .description(meetingDTO.getDescription())
                             .maxParticipants(meetingDTO.getMaxParticipants())
                             .startTime(meetingDTO.getStartTime())
                             .region(meetingDTO.getRegion())
                             .notice(meetingDTO.getNotice())
                             .chatRoomId(meetingDTO.getChatRoomId())
-                            .categoryId(meetingDTO.getCategoryId())
+                            .category(category)
                             .build()
             );
-        } catch (DataIntegrityViolationException | ConstraintViolationException e) {
-            throw new IllegalArgumentException("Meeting title already exists");
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("Data integrity violation: " + e.getMessage());
+        } catch (ConstraintViolationException e) {
+            throw new IllegalArgumentException("Constraint violation: " + e.getMessage());
         }
 
         List<MeetingHashtagEntity> meetingHashtagEntities = meetingDTO
@@ -124,9 +134,10 @@ public class MeetingService {
     }
 
 
-    //title에서 keyword 있는지 확인
+    // title에서 keyword 있는지 확인
     public List<MeetingDTO> searchMeetings(String keyword) {
-        return meetingRepository.findByTitleContaining(keyword).stream()
+        // keyword의 앞뒤 공백 제거 및 대소문자 무시 검색 적용
+        return meetingRepository.findByTitleContainingIgnoreCase(keyword.trim()).stream()
                 .map(MeetingDTO::fromEntity)
                 .collect(Collectors.toList());
     }

@@ -1,7 +1,8 @@
 // 모임 관련 엔티티
 package GGUM_Team3.Server.meeting.entity;
 
-import GGUM_Team3.Server.domain.tag.hashtag.entity.MeetingHashtagEntity;
+import GGUM_Team3.Server.tag.category.entity.CategoryEntity;
+import GGUM_Team3.Server.tag.hashtag.entity.MeetingHashtagEntity;
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,7 +10,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -26,6 +26,10 @@ public class Meeting {
     @Column(nullable = false)
     private String creatorId;
 
+    @ManyToOne
+    @JoinColumn(name = "categoryId", nullable = false)
+    private CategoryEntity category;
+
     @Column(nullable = false)
     private String title;
     private String description;
@@ -34,7 +38,6 @@ public class Meeting {
     private String region; // 지역 필드
     private String notice; // 공지 필드
     private String chatRoomId; // 채팅방ID 필드
-    private String categoryId; // 카테고리ID 필드
 
     @ManyToMany
     @JoinTable(
@@ -48,5 +51,10 @@ public class Meeting {
     // 해시태그와의 연관관계 추가
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingHashtagEntity> meetingHashtagEntities;
+
+    public Meeting(String meetingTitle, CategoryEntity category) {
+        this.title = meetingTitle;
+        this.category = category;
+    }
 
 }
