@@ -1,4 +1,4 @@
-package GGUM_Team3.Server.domain.tempMeeting.dto;
+package GGUM_Team3.Server.tempMeeting.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

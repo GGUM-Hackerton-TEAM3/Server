@@ -1,6 +1,6 @@
-package GGUM_Team3.Server.domain.tempMeeting.repository;
+package GGUM_Team3.Server.tempMeeting.repository;
 
-import GGUM_Team3.Server.domain.tempMeeting.entity.TempMeetingEntity;
+import GGUM_Team3.Server.tempMeeting.entity.TempMeetingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,17 +1,14 @@
-package GGUM_Team3.Server.domain.tempMeeting.controller;
+package GGUM_Team3.Server.tempMeeting.controller;
 
-import GGUM_Team3.Server.domain.tag.hashtag.service.MeetingHashtagService;
-import GGUM_Team3.Server.domain.tempMeeting.dto.TempMeetingDTO;
-import GGUM_Team3.Server.domain.tempMeeting.entity.TempMeetingEntity;
-import GGUM_Team3.Server.domain.tempMeeting.service.TempMeetingService;
+import GGUM_Team3.Server.tempMeeting.dto.TempMeetingDTO;
+import GGUM_Team3.Server.tempMeeting.entity.TempMeetingEntity;
+import GGUM_Team3.Server.tempMeeting.service.TempMeetingService;
+import GGUM_Team3.Server.tag.hashtag.service.MeetingHashtagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/bungae/meetings")
@@ -25,18 +22,18 @@ public class TempMeetingController {
         this.meetingHashtagService = meetingHashtagService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<TempMeetingEntity> createMeeting(@RequestBody TempMeetingDTO tempMeetingDTO) throws BindException {
-
-        try {
-            TempMeetingEntity tempMeeting = tempMeetingService.createMeeting(tempMeetingDTO);
-            return ResponseEntity.ok(tempMeeting);
-        } catch (BindException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
-        }
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<TempMeetingEntity> createMeeting(@RequestBody TempMeetingDTO tempMeetingDTO) throws BindException {
+//
+//        try {
+//            TempMeetingEntity tempMeeting = tempMeetingService.createMeeting(tempMeetingDTO);
+//            return ResponseEntity.ok(tempMeeting);
+//        } catch (BindException e) {
+//            throw new RuntimeException(e);
+//        } catch (IllegalArgumentException e) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
+//        }
+//    }
 
 //    @PutMapping("/addHashtags")
 //    public ResponseEntity<?> addHashtagsToMeeting(@RequestBody TempMeetingDTO tempMeetingDTO) {

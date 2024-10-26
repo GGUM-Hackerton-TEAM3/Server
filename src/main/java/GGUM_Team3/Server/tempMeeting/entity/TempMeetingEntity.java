@@ -1,6 +1,6 @@
-package GGUM_Team3.Server.domain.tempMeeting.entity;
+package GGUM_Team3.Server.tempMeeting.entity;
 
-import GGUM_Team3.Server.domain.tag.hashtag.entity.MeetingHashtagEntity;
+import GGUM_Team3.Server.tag.hashtag.entity.MeetingHashtagEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
