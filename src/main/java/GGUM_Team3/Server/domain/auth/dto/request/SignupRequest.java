@@ -2,6 +2,7 @@ package GGUM_Team3.Server.domain.auth.dto.request;
 
 import GGUM_Team3.Server.domain.user.entity.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
@@ -19,5 +20,7 @@ public class SignupRequest {
     private Gender gender;
     private String profileMessage;
     private String major;
+    @Schema(example = "20011010")
+    @NotEmpty
     private String birthDate;
 }

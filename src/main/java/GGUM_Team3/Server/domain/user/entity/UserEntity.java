@@ -64,7 +64,7 @@ public class UserEntity extends BaseEntity {
         }
     }
 
-    public void updateProfile(SignupRequest signupRequest, String profileImageUrl, Boolean isProfileComplete) {
+    public void updateUser(SignupRequest signupRequest, String profileImageUrl, Boolean isProfileComplete) {
         if (signupRequest.getEmail() != null && !signupRequest.getEmail().isBlank()) {
             this.email = signupRequest.getEmail();
         }
@@ -91,4 +91,15 @@ public class UserEntity extends BaseEntity {
         }
     }
 
+    public void updateUser(String nickname, String profileMessage, String profileImageUrl) {
+        if (nickname != null && !nickname.isBlank()) {
+            this.nickname = nickname;
+        }
+        if (profileMessage != null && !profileMessage.isBlank()) {
+            this.profileMessage = profileMessage;
+        }
+        if (profileImageUrl != null && !profileImageUrl.isBlank()) {
+            this.profileImageUrl = profileImageUrl;
+        }
+    }
 }
