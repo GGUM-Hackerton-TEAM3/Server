@@ -1,4 +1,3 @@
-// 모임 서비스
 package GGUM_Team3.Server.meeting.service;
 
 import GGUM_Team3.Server.tag.category.entity.CategoryEntity;
@@ -13,21 +12,22 @@ import GGUM_Team3.Server.domain.user.service.UserService;
 import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
 import GGUM_Team3.Server.meeting.entity.Meeting;
 import GGUM_Team3.Server.meeting.repository.MeetingRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class MeetingService {
+
     @Autowired
     private MeetingRepository meetingRepository;
 
@@ -45,7 +45,6 @@ public class MeetingService {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
 
     public MeetingDTO createMeeting(MeetingDTO meetingDTO) throws BindException {
         if (meetingDTO.getTitle() == null || meetingDTO.getTitle().isEmpty()) {
@@ -101,6 +100,28 @@ public class MeetingService {
 
         return  MeetingDTO.fromEntity(meeting);
     }
+    public MeetingDTO updateMeeting(String meetingId, MeetingDTO meetingDTO) {
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found"));
+
+        // 업데이트할 필드 설정
+        meeting.setTitle(meetingDTO.getTitle());
+        meeting.setDescription(meetingDTO.getDescription());
+        meeting.setMaxParticipants(meetingDTO.getMaxParticipants());
+        meeting.setStartTime(meetingDTO.getStartTime());
+        meeting.setRegion(meetingDTO.getRegion());
+        meeting.setNotice(meetingDTO.getNotice());
+        meeting.setChatRoomId(meetingDTO.getChatRoomId());
+
+        // 카테고리 설정
+        CategoryEntity category = categoryRepository.findById(meetingDTO.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + meetingDTO.getCategoryId()));
+        meeting.setCategory(category);
+
+        // 업데이트된 모임 정보 저장
+        Meeting updatedMeeting = meetingRepository.save(meeting);
+        return MeetingDTO.fromEntity(updatedMeeting);
+    }
 
     public List<MeetingDTO> getAllMeetings() {
         return meetingRepository.findAll().stream()
@@ -120,6 +141,11 @@ public class MeetingService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Meeting not found with title: " + title));
     }
+    public String getMeetingIdByTitle(String title) {
+        return meetingRepository.findByTitle(title)
+                .map(Meeting::getId)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with title: " + title));
+    }
 
     public Meeting updateMeetingHashtags(MeetingDTO meetingDTO) {
         Meeting meeting = getMeetingByTitle(meetingDTO.getTitle());
@@ -133,11 +159,14 @@ public class MeetingService {
         }
     }
 
-
-    // title에서 keyword 있는지 확인
     public List<MeetingDTO> searchMeetings(String keyword) {
-        // keyword의 앞뒤 공백 제거 및 대소문자 무시 검색 적용
         return meetingRepository.findByTitleContainingIgnoreCase(keyword.trim()).stream()
+                .map(MeetingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<MeetingDTO> getMeetingsByUser(String userId) {
+        return meetingRepository.findByParticipantsId(userId).stream()
                 .map(MeetingDTO::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -167,4 +196,3 @@ public class MeetingService {
         return MeetingDTO.fromEntity(updatedMeeting);
     }
 }
-

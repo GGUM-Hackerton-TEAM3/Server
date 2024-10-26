@@ -1,68 +1,94 @@
 package GGUM_Team3.Server.meeting.controller;
 
+import GGUM_Team3.Server.global.sercurity.TokenProvider;
 import GGUM_Team3.Server.meeting.DTO.MeetingDTO;
 import GGUM_Team3.Server.meeting.service.MeetingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/meetings")
+@Tag(name = "모임 관련 API", description = "모임 생성, 조회, 갱신, 참여 및 탈퇴 관련 API")
 public class MeetingController {
-    @Autowired
-    private MeetingService meetingService;
 
-    //@PreAuthorize("isAuthenticated()")
-    // 테스트 완료
+    private final MeetingService meetingService;
+    private final TokenProvider tokenProvider;
+
+    @Operation(summary = "모임 생성", description = "새로운 모임을 생성합니다.")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     public ResponseEntity<?> createMeeting(@RequestBody MeetingDTO meetingDTO) {
         try {
             MeetingDTO createdMeeting = meetingService.createMeeting(meetingDTO);
             return ResponseEntity.ok(createdMeeting);
-        } catch (BindException e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body("Meeting title cannot be null or empty.");
         }
     }
 
-    // 테스트 완료
+    @Operation(summary = "모임 갱신", description = "모임 ID로 특정 모임 정보를 갱신합니다.")
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/{id}/update")
+    public ResponseEntity<MeetingDTO> updateMeeting(
+            @PathVariable String id,
+            @RequestBody MeetingDTO meetingDTO) {
+        MeetingDTO updatedMeeting = meetingService.updateMeeting(id, meetingDTO);
+        return ResponseEntity.ok(updatedMeeting);
+    }
+
+    @Operation(summary = "사용자 참여 모임 조회", description = "사용자가 참여 중인 모든 모임 목록을 조회합니다.")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/my-meetings")
+    public ResponseEntity<List<MeetingDTO>> getMyMeetings(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String userId = tokenProvider.validateAndGetUserId(token);
+        List<MeetingDTO> myMeetings = meetingService.getMeetingsByUser(userId);
+        return ResponseEntity.ok(myMeetings);
+    }
+
+    // 기존 코드
+    @Operation(summary = "모임 검색", description = "키워드로 모임을 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<List<MeetingDTO>> searchMeetings(@RequestParam String keyword) {
-        // URL 디코딩을 적용하여 공백 처리 가능하도록 수정
-        try {
-            keyword = URLDecoder.decode(keyword, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.ok(meetingService.searchMeetings(keyword));
     }
 
+    @Operation(summary = "모임 ID 검색", description = "모임 제목으로 모임 ID를 검색합니다.")
+    @GetMapping("/search-id")
+    public ResponseEntity<String> searchMeetingIdByTitle(@RequestParam String title) {
+        String meetingId = meetingService.getMeetingIdByTitle(title);
+        return ResponseEntity.ok(meetingId);
+    }
 
+    @Operation(summary = "모임 조회", description = "모임 ID로 모임 정보를 조회합니다.")
     @GetMapping("/{id}")
     public ResponseEntity<MeetingDTO> getMeetingById(@PathVariable String id) {
         return ResponseEntity.ok(meetingService.getMeetingById(id));
     }
 
-    @GetMapping
-    public ResponseEntity<List<MeetingDTO>> getAllMeetings() {
-        return ResponseEntity.ok(meetingService.getAllMeetings());
-    }
-
+    @Operation(summary = "모임 참여", description = "모임 ID와 사용자 토큰으로 모임에 참여합니다.")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/join")
-    public ResponseEntity<MeetingDTO> joinMeeting(@PathVariable String id, @RequestParam String userId) {
+    public ResponseEntity<MeetingDTO> joinMeetingById(@PathVariable String id, HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String userId = tokenProvider.validateAndGetUserId(token);
         return ResponseEntity.ok(meetingService.joinMeeting(id, userId));
     }
 
+    @Operation(summary = "모임 탈퇴", description = "모임 ID와 사용자 토큰으로 모임에서 탈퇴합니다.")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/leave")
-    public ResponseEntity<MeetingDTO> leaveMeeting(@PathVariable String id, @RequestParam String userId) {
+    public ResponseEntity<MeetingDTO> leaveMeetingById(@PathVariable String id, HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String userId = tokenProvider.validateAndGetUserId(token);
         return ResponseEntity.ok(meetingService.leaveMeeting(id, userId));
     }
 }
