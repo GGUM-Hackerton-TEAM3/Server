@@ -23,7 +23,6 @@ public class MeetingController {
     private final TokenProvider tokenProvider;
 
     @Operation(summary = "모임 생성", description = "새로운 모임을 생성합니다.")
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     public ResponseEntity<?> createMeeting(@RequestBody MeetingDTO meetingDTO) {
         try {
@@ -35,7 +34,6 @@ public class MeetingController {
     }
 
     @Operation(summary = "모임 갱신", description = "모임 ID로 특정 모임 정보를 갱신합니다.")
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}/update")
     public ResponseEntity<MeetingDTO> updateMeeting(
             @PathVariable String id,
@@ -45,7 +43,6 @@ public class MeetingController {
     }
 
     @Operation(summary = "사용자 참여 모임 조회", description = "사용자가 참여 중인 모든 모임 목록을 조회합니다.")
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/my-meetings")
     public ResponseEntity<List<MeetingDTO>> getMyMeetings(HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
@@ -75,7 +72,6 @@ public class MeetingController {
     }
 
     @Operation(summary = "모임 참여", description = "모임 ID와 사용자 토큰으로 모임에 참여합니다.")
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/join")
     public ResponseEntity<MeetingDTO> joinMeetingById(@PathVariable String id, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
@@ -84,7 +80,6 @@ public class MeetingController {
     }
 
     @Operation(summary = "모임 탈퇴", description = "모임 ID와 사용자 토큰으로 모임에서 탈퇴합니다.")
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{id}/leave")
     public ResponseEntity<MeetingDTO> leaveMeetingById(@PathVariable String id, HttpServletRequest request) {
         String token = request.getHeader("Authorization").substring(7);
