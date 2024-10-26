@@ -1,6 +1,7 @@
 server:
   port: 8080
   forward-headers-strategy: framework
+
 spring:
   datasource:
     url: jdbc:h2:mem:oneul_db
@@ -18,15 +19,14 @@ spring:
       hibernate:
         show-sql: true
         format_sql: true
+  sql:
+    init:
+      mode: always # 데이터 초기화 SQL을 항상 실행
   mail:
     host: smtp.gmail.com
     port: 587
-    #username: ${MAIL_USERNAME}
-    #password: ${MAIL_PASSWORD}
-    # 테스트 용
-    username: ${MAIL_USERNAME:dummy-mail-username}
-    password: ${MAIL_PASSWORD:dummy-mail-password}
-
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:

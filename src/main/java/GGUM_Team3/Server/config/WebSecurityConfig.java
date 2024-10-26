@@ -60,10 +60,9 @@ public class WebSecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
 
-                                // 해시태그용
-                                "/bungae/meetings/**",
-                                "/bungae/hashtags/**"
-
+                                // 테스트용 CSRF 허용
+                                "/api/meetings/**",
+                                "/meeting/hashtags/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                     )
