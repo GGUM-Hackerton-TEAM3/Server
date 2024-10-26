@@ -16,4 +16,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, String> {
     Optional<Meeting> findByTitle(String title);
 
     List<Meeting> findByTitleContainingIgnoreCase(String keyword);
+
+    // 특정 사용자 ID가 포함된 모임 목록 조회
+    List<Meeting> findByParticipantsId(String userId);
 }
