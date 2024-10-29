@@ -1,7 +1,7 @@
 package GGUM_Team3.Server.config;
 
-import GGUM_Team3.Server.tag.category.entity.CategoryEntity;
-import GGUM_Team3.Server.tag.category.repository.CategoryRepository;
+import GGUM_Team3.Server.domain.tag.category.entity.CategoryEntity;
+import GGUM_Team3.Server.domain.tag.category.repository.CategoryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
