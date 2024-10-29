@@ -1,9 +1,13 @@
 package GGUM_Team3.Server.domain.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class LoginRequest {
     @NotBlank
     private String email;

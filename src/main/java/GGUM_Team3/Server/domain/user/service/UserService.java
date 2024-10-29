@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,23 +27,23 @@ public class UserService {
     @Transactional
     public UserEntity create(final UserEntity userEntity) {
         if(userEntity == null || userEntity.getEmail() == null) {
-            throw new RuntimeException("Invalid arguments");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid user entity");
         }
         final String email = userEntity.getEmail();
         if(userRepository.existsByEmail(email)) {
             log.warn("Email already exists {}",email);
-            throw new RuntimeException("Email already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
         return userRepository.save(userEntity);
     }
 
-    public Optional<UserEntity> getById(String userId) {
-        return userRepository.findById(userId);
+    public UserEntity getById(final String userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    public UserEntity getByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+    public UserEntity getByEmail(final String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     public void validateAlreadyExistEmail(final String email) {
@@ -53,7 +52,7 @@ public class UserService {
         }
     }
 
-    public static LocalDate getBirthDateAsLocalDate(String birthDateString) {
+    public static LocalDate getBirthDateAsLocalDate(final String birthDateString) {
         if(birthDateString == null) return null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         try {
@@ -63,8 +62,8 @@ public class UserService {
         }
     }
 
-    public UserProfileResponse getUserProfile(String userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"User not found"));
+    public UserProfileResponse getUserProfile(final String userId) {
+        final UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"User not found"));
 
         return UserProfileResponse.of(
                 user.getProfileImageUrl(),
@@ -76,16 +75,15 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponse updateUserProfile(String userId, UserProfileUpdateRequest updateRequest) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+    public UserProfileResponse updateUserProfile(final String userId, final UserProfileUpdateRequest updateRequest) {
+        final UserEntity user = getById(userId);
 
         user.updateUser(
                 updateRequest.getNickname(),
                 updateRequest.getProfileMessage(),
                 imageService.saveImage(updateRequest.getProfileImage())
         );
-        return new UserProfileResponse(
+        return UserProfileResponse.of(
                 user.getProfileImageUrl(),
                 user.getAge(),
                 user.getMajor(),

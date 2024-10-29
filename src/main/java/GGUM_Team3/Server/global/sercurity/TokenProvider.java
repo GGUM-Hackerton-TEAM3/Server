@@ -1,10 +1,12 @@
 package GGUM_Team3.Server.global.sercurity;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import GGUM_Team3.Server.domain.user.entity.UserEntity;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,31 +21,34 @@ import lombok.extern.slf4j.Slf4j;
 public class TokenProvider {
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
-
-    public String create(UserEntity userEntity) {
-        Date expireDate = Date.from(
-                Instant.now().plus(1, ChronoUnit.DAYS));
-
-        return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .setSubject(userEntity.getId())
-                .setIssuer("oneul")
-                .setIssuedAt(new Date())
-                .setExpiration(expireDate)
-                .compact();
-    }
+    @Value("${jwt.access-token-time}")
+    private long ACCESS_TOKEN_TIME;
 
     public String create(String userId) {
-        Date expireDate = Date.from(
-                Instant.now().plus(1, ChronoUnit.DAYS));
+        Instant now = Instant.now();
+        Instant expireInstant = now.plusMillis(ACCESS_TOKEN_TIME);
+        String issuer = "moamoa";
 
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("alg", "HS512")
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .setSubject(userId)
-                .setIssuer("oneul")
-                .setIssuedAt(new Date())
-                .setExpiration(expireDate)
+                .setIssuer(issuer)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expireInstant))
                 .compact();
+    }
+    public Claims getClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) { // Access Token
+            return e.getClaims();
+        }
     }
 
     public String validateAndGetUserId(String token) {

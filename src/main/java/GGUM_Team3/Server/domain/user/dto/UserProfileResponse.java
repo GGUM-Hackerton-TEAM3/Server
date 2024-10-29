@@ -6,22 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Schema(description = "유저 프로필 응답")
 public class UserProfileResponse {
-    private String profileImageUrl;
-    private int age;
-    private String major;
-    private String nickname;
-    private String profileMessage;
+    private final String profileImageUrl;
+    private final Integer age;
+    private final String major;
+    private final String nickname;
+    private final String profileMessage;
 
-    public static UserProfileResponse of(String profileImageUrl,
-                                         int age,
-                                         String major,
-                                         String nickname,
-                                         String profileMessage) {
+    public static UserProfileResponse of(final String profileImageUrl,
+                                         final Integer age,
+                                         final String major,
+                                         final String nickname,
+                                         final String profileMessage) {
         return new UserProfileResponse(
                 profileImageUrl,
                 age,

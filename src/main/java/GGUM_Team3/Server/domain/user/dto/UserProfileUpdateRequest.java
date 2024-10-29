@@ -5,7 +5,8 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@Builder
 @Getter
 @Setter
 public class UserProfileUpdateRequest {

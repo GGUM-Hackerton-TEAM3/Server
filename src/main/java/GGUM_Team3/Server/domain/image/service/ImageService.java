@@ -27,7 +27,7 @@ public class ImageService {
     private String region;
 
     @Transactional
-    public String saveImage(MultipartFile file) {
+    public String saveImage(final MultipartFile file) {
         if(file == null) return null;
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
 
@@ -47,7 +47,7 @@ public class ImageService {
     }
 
     @Transactional
-    public void deleteImage(String fileUrl) {
+    public void deleteImage(final String fileUrl) {
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 
         try {
@@ -62,7 +62,7 @@ public class ImageService {
     }
 
     @Transactional
-    public String updateImage(String existingFileUrl, MultipartFile newFile) throws IOException {
+    public String updateImage(final String existingFileUrl, MultipartFile newFile) throws IOException {
         deleteImage(existingFileUrl);
         return saveImage(newFile);
     }
