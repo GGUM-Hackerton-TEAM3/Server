@@ -58,7 +58,7 @@ logging.level:
 
 jwt:
   secret-key: CwS0ejODKrwKcZFCkXAeScfgixh2dKKtZj4eN5FdJoDHAeXpd7ScsxDqCmTGJtOGhQ75T33L1thACccTgjXuvw==
-
+  access-token-time: 8640000000000
 management:
   endpoints:
     web:
