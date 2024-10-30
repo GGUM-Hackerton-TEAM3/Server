@@ -25,7 +25,7 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
-    @Operation(summary = "내 정보 수정", description = "UserProfileResponse 반한")
+    @Operation(summary = "내 정보 수정")
     @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserProfileResponse> updateUserProfile(
             @AuthenticationPrincipal String userId,

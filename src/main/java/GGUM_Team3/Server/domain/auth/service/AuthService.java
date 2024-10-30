@@ -27,6 +27,7 @@ import static GGUM_Team3.Server.domain.user.service.UserService.getBirthDateAsLo
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
     private final UserRepository userRepository;
     private final ImageService imageService;
@@ -38,19 +39,19 @@ public class AuthService {
     private final JavaMailSender mailSender;
 
     public LoginResponse login(final LoginRequest loginRequest){
-        final UserEntity user = getByCredentials(loginRequest.getEmail(), loginRequest.getPassword(), passwordEncoder);
-        if(user !=null){
-            final String token = tokenProvider.create(user);
-            return LoginResponse.of(token, user.getIsProfileComplete());
-
-        } else {
+        final UserEntity user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login failed"));
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Login failed");
         }
+        String token = tokenProvider.create(user.getId());
+        return LoginResponse.of(token, null);
     }
 
+    @Transactional
     public LoginResponse loginWithGoogle(final String googleToken) {
-        String userId = googleTokenVerifier.verify(googleToken); // 구글 토큰 검증
-        String email = googleTokenVerifier.getEmail(googleToken); // 구글 토큰에서 이메일 추출
+        final String userId = googleTokenVerifier.verify(googleToken); // 구글 토큰 검증
+        final String email = googleTokenVerifier.getEmail(googleToken); // 구글 토큰에서 이메일 추출
 
         if (userId != null && email != null) {
             // 이메일로 기존 사용자 확인
@@ -68,7 +69,7 @@ public class AuthService {
             }
 
             // JWT 생성 및 반환
-            final String jwtToken = tokenProvider.create(user);
+            final String jwtToken = tokenProvider.create(user.getId());
             return LoginResponse.of(jwtToken, user.getIsProfileComplete());
         } else {
             throw new RuntimeException("Google token validation failed");
@@ -104,10 +105,10 @@ public class AuthService {
 
     @Transactional
     public void signupWithGoogle(final String userId, final SignupRequest signupRequest) {
-        UserEntity user = userService.getById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        final UserEntity user = userService.getById(userId);
         user.updateUser(
                 signupRequest,
-                signupRequest.getProfileImage() != null ? imageService.saveImage(signupRequest.getProfileImage()) : null,
+                signupRequest.getProfileImage().isEmpty() ? imageService.saveImage(signupRequest.getProfileImage()) : null,
                 true);
     }
 
@@ -116,7 +117,9 @@ public class AuthService {
         return String.format("%06d", random.nextInt(1000000));
     }
 
-    public void sendVerificationCode(String email) {
+    public void sendVerificationCode(final String email) {
+        if(userRepository.existsByEmail(email)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 가입된 이메일입니다.");
+
         if (isCatholicUniversityEmail(email)) {
             String code = generateVerificationCode();
 
@@ -124,7 +127,7 @@ public class AuthService {
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
-            message.setSubject("Oneul Verification Code");
+            message.setSubject("MoaMoa Verification Code");
             message.setText("Your verification code is: " + code);
             mailSender.send(message);
         } else {
@@ -132,13 +135,13 @@ public class AuthService {
         }
     }
 
-    public void verifyCode(String email, String code) {
+    public void verifyCode(final String email, final String code) {
         String storedCode = redisTemplate.opsForValue().get(email);
         if(!code.equals(storedCode)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않거나 만료되었습니다.");
         redisTemplate.delete(email);
     }
 
-    public boolean isCatholicUniversityEmail(String email) {
+    public boolean isCatholicUniversityEmail(final String email) {
         String[] strings = email.split("@");
         if (strings.length == 2) {
             String domain = strings[1];

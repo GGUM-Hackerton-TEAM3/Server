@@ -1,8 +1,12 @@
 package GGUM_Team3.Server.domain.auth.dto.request;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class GoogleLoginRequest {
     private String token;
 }

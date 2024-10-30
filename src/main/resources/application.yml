@@ -38,17 +38,11 @@ spring:
       host: 127.0.0.1
       port: 6379
       password: 1234
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
-#cloud:
-#  aws:
-#    bucket: ${AWS_BUCKET}
-#    credentials:
-#      access-key: ${AWS_ACCESS_KEY}
-#      secret-key: ${AWS_SECRET_KEY}
-#    region:
-#      static: ap-northeast-2
-
-# 테스트용
 cloud:
   aws:
     bucket: ${AWS_BUCKET:dummy-bucket}
@@ -64,7 +58,7 @@ logging.level:
 
 jwt:
   secret-key: CwS0ejODKrwKcZFCkXAeScfgixh2dKKtZj4eN5FdJoDHAeXpd7ScsxDqCmTGJtOGhQ75T33L1thACccTgjXuvw==
-
+  access-token-time: 8640000000000
 management:
   endpoints:
     web:

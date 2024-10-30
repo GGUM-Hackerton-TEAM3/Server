@@ -5,6 +5,8 @@ import GGUM_Team3.Server.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -12,12 +14,9 @@ import java.time.Period;
 import static GGUM_Team3.Server.domain.user.service.UserService.getBirthDateAsLocalDate;
 
 @Getter
-@Setter
 @Entity
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
+@Table(name = "users")
 public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(generator="system-uuid")
@@ -55,12 +54,27 @@ public class UserEntity extends BaseEntity {
     @Column
     private LocalDate birthDate;
 
+    @Builder
+    public UserEntity(String id, String username, String email, String nickname, String password, String profileImageUrl, String profileMessage, String major, Gender gender, Boolean isProfileComplete, LocalDate birthDate) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.profileImageUrl = profileImageUrl;
+        this.profileMessage = profileMessage;
+        this.major = major;
+        this.gender = gender;
+        this.isProfileComplete = isProfileComplete;
+        this.birthDate = birthDate;
+    }
+
     public int getAge() {
         LocalDate currentDate = LocalDate.now();
         if (this.birthDate != null && !this.birthDate.isAfter(currentDate)) {
             return Period.between(this.birthDate, LocalDate.now()).getYears();
         } else {
-            throw new IllegalArgumentException("Invalid birth date");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid birth date");
         }
     }
 

@@ -5,9 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
+
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 public class SignupRequest {
